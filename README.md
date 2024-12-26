@@ -18,7 +18,21 @@ A tool for resetting the trial period of the Cursor Editor.
 
 ## Usage
 
-### Download Executable
+### Method 1: Direct Script Execution
+
+#### Windows PowerShell
+
+```powershell
+irm https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.ps1 | iex
+```
+
+#### macOS/Linux
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.sh | sh
+```
+
+### Method 2: Download Executable
 
 1. Go to our [releases page](https://github.com/isboyjc/cursor-reset/releases)
 2. Download the version for your operating system:

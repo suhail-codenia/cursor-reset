@@ -18,7 +18,21 @@ Cursor 编辑器试用期重置工具
 
 ## 使用方法
 
-### 下载可执行文件
+### 方式一：直接执行脚本
+
+#### Windows PowerShell
+
+```powershell
+irm https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.ps1 | iex
+```
+
+#### macOS/Linux
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.sh | sh
+```
+
+### 方式二：下载可执行文件
 
 1. 访问 [releases 页面](https://github.com/isboyjc/cursor-reset/releases)
 2. 下载对应系统的版本：
