@@ -26,10 +26,20 @@ Cursor 编辑器试用期重置工具
 irm https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.ps1 | iex
 ```
 
+**jsdelivr cdn **
+```powershell
+irm https://cdn.jsdelivr.net/gh/isboyjc/cursor-reset@main/scripts/reset.ps1 | iex
+```
+
 #### macOS/Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.sh | sh
+```
+
+**jsdelivr cdn **
+```bash
+curl -fsSL https://cdn.jsdelivr.net/gh/isboyjc/cursor-reset@main/scripts/reset.sh | sh
 ```
 
 ### 方式二：下载可执行文件
