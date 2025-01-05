@@ -26,7 +26,7 @@ A tool for resetting the trial period of the Cursor Editor.
 irm https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.ps1 | iex
 ```
 
-**jsdelivr cdn **
+**jsdelivr cdn**
 ```powershell
 irm https://cdn.jsdelivr.net/gh/isboyjc/cursor-reset@main/scripts/reset.ps1 | iex
 ```
@@ -38,7 +38,7 @@ irm https://cdn.jsdelivr.net/gh/isboyjc/cursor-reset@main/scripts/reset.ps1 | ie
 curl -fsSL https://raw.githubusercontent.com/isboyjc/cursor-reset/main/scripts/reset.sh | sh
 ```
 
-**jsdelivr cdn **
+**jsdelivr cdn**
 ```bash
 curl -fsSL https://cdn.jsdelivr.net/gh/isboyjc/cursor-reset@main/scripts/reset.sh | sh
 ```
