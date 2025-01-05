@@ -59,6 +59,13 @@ jobs:
           pkg . --targets node18-linux-x64,node18-macos-x64,node18-win-x64 --output dist/cursor-reset
           # 为 macOS 版本添加执行权限
           chmod +x dist/cursor-reset-macos
+          
+          # 压缩各个平台的文件
+          cd dist
+          zip cursor-reset-macos.zip cursor-reset-macos
+          zip cursor-reset-win.zip cursor-reset-win.exe
+          zip cursor-reset-linux.zip cursor-reset-linux
+          cd ..
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -68,8 +75,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            dist/cursor-reset-linux
-            dist/cursor-reset-macos
-            dist/cursor-reset-win.exe
+            dist/cursor-reset-linux.zip
+            dist/cursor-reset-macos.zip
+            dist/cursor-reset-win.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
