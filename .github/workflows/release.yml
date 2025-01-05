@@ -57,6 +57,8 @@ jobs:
           # 为不同平台打包
           npm install -g pkg
           pkg . --targets node18-linux-x64,node18-macos-x64,node18-win-x64 --output dist/cursor-reset
+          # 为 macOS 版本添加执行权限
+          chmod +x dist/cursor-reset-macos
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
