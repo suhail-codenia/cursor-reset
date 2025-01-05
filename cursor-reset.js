@@ -5,6 +5,13 @@
  * 
  * 这是一个 Cursor 编辑器试用重置工具
  * 该脚本通过重置 Cursor 配置文件中的设备 ID 来生成新的随机设备 ID，从而重置试用期。
+ * 支持 Windows、macOS 和 Linux 系统。
+ * 
+ * 主要功能：
+ * - 自动检测并关闭运行中的 Cursor 进程
+ * - 备份现有配置文件
+ * - 生成新的随机设备 ID
+ * - 统计重置历史记录
  * 
  * 仓库地址: https://github.com/isboyjc/cursor-reset
  * 作者: @isboyjc
@@ -20,12 +27,10 @@ const readline = require('readline');
 
 /**
  * 等待用户按键
- * Windows 系统专用功能
- * 注意：process.platform 返回 'win32' 是 Node.js 的历史遗留问题
- * 在 64 位 Windows 系统上也是返回 'win32'
- * 这与系统实际位数无关，只是用来标识这是 Windows 系统
+ * 在 Windows 系统下运行时，程序结束前等待用户按键
+ * 这样可以防止在双击运行时窗口立即关闭
  * 
- * @returns {Promise<void>}
+ * @returns {Promise<void>} 返回一个 Promise，在用户按键后解决
  */
 function waitForKeypress() {
   // 在 Windows 系统下（无论 32 位还是 64 位）且不是在终端中运行时等待
@@ -59,8 +64,10 @@ function waitForKeypress() {
 
 /**
  * 用户确认提示
- * @param {string} question 提示问题
- * @returns {Promise<boolean>} 用户选择结果
+ * 显示一个 yes/no 提示，等待用户输入
+ * 
+ * @param {string} question 要显示给用户的问题
+ * @returns {Promise<boolean>} 如果用户输入 'y' 或 'Y' 返回 true，否则返回 false
  */
 async function confirm(question) {
   const rl = readline.createInterface({
@@ -77,8 +84,10 @@ async function confirm(question) {
 }
 
 /**
- * 获取 Windows 下的 Cursor 进程名
- * @returns {Promise<string|null>} 返回进程名，如果没找到返回 null
+ * 获取 Windows 系统下运行的 Cursor 进程名
+ * 使用 wmic 命令获取详细的进程信息，并过滤出 Cursor 相关进程
+ * 
+ * @returns {Promise<string|null>} 返回找到的第一个 Cursor 进程名，如果没找到则返回 null
  */
 async function getWindowsCursorProcessName() {
   try {
@@ -119,6 +128,11 @@ async function getWindowsCursorProcessName() {
 
 /**
  * 检查 Cursor 是否正在运行
+ * 根据不同操作系统使用不同的命令检查进程
+ * - Windows: 使用 wmic 命令
+ * - macOS: 使用 pgrep 命令
+ * - Linux: 使用 pgrep 命令
+ * 
  * @returns {boolean} 如果 Cursor 正在运行返回 true，否则返回 false
  */
 function isCursorRunning() {
@@ -166,8 +180,13 @@ function isCursorRunning() {
 }
 
 /**
- * 关闭 Cursor 进程
- * @returns {Promise<boolean>} 是否成功关闭
+ * 强制关闭 Cursor 进程
+ * 根据不同操作系统使用相应的命令关闭进程：
+ * - Windows: taskkill 命令
+ * - macOS: pkill 命令
+ * - Linux: pkill 命令
+ * 
+ * @returns {Promise<boolean>} 成功关闭返回 true，失败返回 false
  */
 async function killCursorProcess() {
   try {
@@ -214,8 +233,11 @@ async function killCursorProcess() {
 
 /**
  * 格式化时间戳
- * @param {Date} date - 日期对象
- * @returns {string} 格式化后的时间字符串 (yyyyMMddHHmmssSSS)
+ * 将日期对象转换为格式化的时间字符串
+ * 格式：yyyyMMddHHmmssSSS
+ * 
+ * @param {Date} date 要格式化的日期对象
+ * @returns {string} 格式化后的时间字符串
  */
 function formatTimestamp(date) {
   const pad = (num, len = 2) => String(num).padStart(len, '0');
@@ -232,9 +254,12 @@ function formatTimestamp(date) {
 }
 
 /**
- * 备份指定文件的时间戳备份
- * @param {string} filePath - 需要备份的文件路径
- * @returns {Promise<string>} 备份文件的路径
+ * 备份配置文件
+ * 创建配置文件的时间戳备份，文件名格式为：原文件名.时间戳.bak
+ * 
+ * @param {string} filePath 需要备份的文件路径
+ * @returns {Promise<string>} 备份文件的完整路径
+ * @throws {Error} 备份失败时抛出错误
  */
 async function backupFile(filePath) {
   try {
@@ -249,7 +274,10 @@ async function backupFile(filePath) {
 
 /**
  * 检查 Cursor 是否已安装
- * @returns {Promise<boolean>} 如果 Cursor 已安装返回 true，否则返回 false
+ * 根据不同操作系统检查 Cursor 的默认安装位置
+ * 
+ * @returns {Promise<boolean>} Cursor 已安装返回 true，否则返回 false
+ * @throws {Error} 不支持的操作系统时抛出错误
  */
 async function isCursorInstalled() {
   const platform = process.platform;
@@ -290,9 +318,14 @@ async function isCursorInstalled() {
 }
 
 /**
- * 根据操作系统类型确定存储文件的位置
- * @returns {string} 返回对应操作系统下 Cursor 存储文件的完整路径
- * @throws {Error} 当操作系统不受支持时抛出异常
+ * 获取 Cursor 存储文件路径
+ * 根据不同操作系统返回配置文件的标准位置：
+ * - Windows: %APPDATA%/Cursor/User/globalStorage/storage.json
+ * - macOS: ~/Library/Application Support/Cursor/User/globalStorage/storage.json
+ * - Linux: ~/.config/Cursor/User/globalStorage/storage.json
+ * 
+ * @returns {string} 配置文件的完整路径
+ * @throws {Error} 不支持的操作系统时抛出错误
  */
 function getStorageFile() {
   const platform = process.platform;
@@ -311,8 +344,13 @@ function getStorageFile() {
 }
 
 /**
- * 生成随机设备ID
- * @returns {object} 包含新生成的设备ID的对象
+ * 生成新的随机设备标识
+ * 生成三种不同的设备 ID：
+ * - machineId: 32 字节的随机十六进制字符串
+ * - macMachineId: 32 字节的随机十六进制字符串
+ * - devDeviceId: UUID v4 格式的随机字符串
+ * 
+ * @returns {object} 包含新生成的三个设备 ID 的对象
  */
 function generateDeviceIds() {
   return {
@@ -323,9 +361,12 @@ function generateDeviceIds() {
 }
 
 /**
- * 获取配置文件的所有备份
- * @param {string} configPath - 配置文件路径
- * @returns {Promise<Array<{name: string, time: Date}>>} 备份文件信息列表，按时间倒序排列
+ * 获取配置文件的所有备份记录
+ * 搜索指定目录下所有以 .bak 结尾的备份文件
+ * 解析文件名中的时间戳并按时间倒序排列
+ * 
+ * @param {string} configPath 配置文件路径
+ * @returns {Promise<Array<{name: string, time: Date}>>} 备份文件信息数组
  */
 async function getBackupFiles(configPath) {
   try {
@@ -372,14 +413,14 @@ async function getBackupFiles(configPath) {
 
 /**
  * 重置 Cursor 的设备标识
- * 该函数会执行以下操作：
- * 1. 检查 Cursor 是否在运行
- * 2. 获取存储文件路径
- * 3. 创建必要的目录结构
- * 4. 备份现有的存储文件
- * 5. 生成新的随机设备标识
- * 6. 更新存储文件
- * 7. 打印新生成的设备标识信息
+ * 执行完整的重置流程：
+ * 1. 检查 Cursor 安装状态
+ * 2. 检查并关闭运行中的 Cursor
+ * 3. 准备配置目录
+ * 4. 备份现有配置
+ * 5. 生成新的设备 ID
+ * 6. 保存新配置
+ * 7. 显示重置统计信息
  */
 async function resetCursorId() {
   try {
@@ -464,6 +505,8 @@ async function resetCursorId() {
 
 /**
  * 主程序入口
+ * 执行重置流程并处理异常
+ * 确保在程序结束前等待用户确认（Windows）
  */
 async function main() {
   let exitCode = 0;
