@@ -1,6 +1,6 @@
 {
   "name": "cursor-reset",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Cursor 编辑器试用重置工具",
   "main": "cursor-reset.js",
   "bin": "cursor-reset.js",
