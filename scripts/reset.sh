@@ -69,6 +69,32 @@ backup_config() {
     echo "$backup_file"
 }
 
+# 禁用自动更新
+disable_cursor_update() {
+    local updater_path=""
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        updater_path="$HOME/Library/Application Support/Caches/cursor-updater"
+    elif [[ "$OSTYPE" == "linux"* ]]; then
+        updater_path="$HOME/.config/cursor-updater"
+    else
+        echo "❌ 不支持的操作系统"
+        return 1
+    fi
+
+    # 如果存在目录或文件，先删除
+    if [ -e "$updater_path" ]; then
+        rm -rf "$updater_path"
+    fi
+
+    # 创建空文件来阻止更新
+    touch "$updater_path"
+    if [ $? -eq 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # 主程序
 main() {
     echo "🔍 正在检查 Cursor 编辑器..."
@@ -136,7 +162,23 @@ EOF
     echo
     echo "📝 配置文件路径：$STORAGE_FILE"
     echo
+    echo "🔄 自动更新设置"
+    echo "是否要禁用 Cursor 自动更新功能？ (y/N): "
+    read -r response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        echo "正在禁用自动更新..."
+        if disable_cursor_update; then
+            echo "✅ 自动更新已成功禁用"
+        else
+            echo "❌ 禁用自动更新失败"
+        fi
+    fi
+
+    echo
     echo "✨ 现在可以启动 Cursor 编辑器了"
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        echo "⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本"
+    fi
 }
 
 main

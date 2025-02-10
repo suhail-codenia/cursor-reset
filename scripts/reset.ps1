@@ -59,6 +59,25 @@ function Backup-ConfigFile {
     return $backupFile
 }
 
+# 禁用自动更新
+function Disable-CursorUpdate {
+    $updaterPath = Join-Path $env:LOCALAPPDATA "cursor-updater"
+    
+    try {
+        # 如果存在目录或文件，先删除
+        if (Test-Path $updaterPath) {
+            Remove-Item -Path $updaterPath -Force -Recurse -ErrorAction Stop
+        }
+        
+        # 创建空文件来阻止更新
+        New-Item -ItemType File -Path $updaterPath -Force | Out-Null
+        return $true
+    } catch {
+        Write-Host "禁用自动更新时出错：$($_.Exception.Message)"
+        return $false
+    }
+}
+
 # 主程序
 function Main {
     Write-Host "🔍 正在检查 Cursor 编辑器..."
@@ -127,7 +146,22 @@ function Main {
     Write-Host
     Write-Host "📝 配置文件路径：$storageFile"
     Write-Host
+    Write-Host "🔄 自动更新设置"
+    $response = Read-Host "是否要禁用 Cursor 自动更新功能？ (y/N)"
+    if ($response -eq 'y' -or $response -eq 'Y') {
+        Write-Host "正在禁用自动更新..."
+        if (Disable-CursorUpdate) {
+            Write-Host "✅ 自动更新已成功禁用"
+        } else {
+            Write-Host "❌ 禁用自动更新失败"
+        }
+    }
+
+    Write-Host
     Write-Host "✨ 现在可以启动 Cursor 编辑器了"
+    if ($response -eq 'y' -or $response -eq 'Y') {
+        Write-Host "⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本"
+    }
 }
 
 # 运行主程序

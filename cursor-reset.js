@@ -412,6 +412,56 @@ async function getBackupFiles(configPath) {
 }
 
 /**
+ * 禁用 Cursor 自动更新
+ * 通过删除更新目录并创建同名文件来阻止更新
+ * 
+ * @returns {Promise<boolean>} 成功返回 true，失败返回 false
+ */
+async function disableAutoUpdate() {
+  try {
+    const platform = process.platform;
+    let updaterPath = '';
+
+    switch (platform) {
+      case 'win32':
+        updaterPath = path.join(process.env.LOCALAPPDATA, 'cursor-updater');
+        break;
+      case 'darwin':
+        updaterPath = path.join(os.homedir(), 'Library', 'Application Support', 'Caches','cursor-updater');
+        break;
+      case 'linux':
+        updaterPath = path.join(os.homedir(), '.config', 'cursor-updater');
+        break;
+      default:
+        throw new Error(`不支持的操作系统: ${platform}`);
+    }
+
+    // 删除更新目录（如果存在）
+    try {
+      const stat = await fs.stat(updaterPath);
+      if (stat.isDirectory()) {
+        await fs.rm(updaterPath, { recursive: true, force: true });
+      } else {
+        await fs.unlink(updaterPath);
+      }
+    } catch (error) {
+      // 如果目录不存在，忽略错误
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    // 创建同名文件来阻止更新
+    await fs.writeFile(updaterPath, '', { flag: 'w' });
+    
+    return true;
+  } catch (error) {
+    console.error('禁用自动更新时出错：', error);
+    return false;
+  }
+}
+
+/**
  * 重置 Cursor 的设备标识
  * 执行完整的重置流程：
  * 1. 检查 Cursor 安装状态
@@ -497,7 +547,22 @@ async function resetCursorId() {
         console.log(`   ${index + 1}. ${file.name}`);
       });
     }
+
+    console.log('\n🔄 自动更新设置');
+    const shouldDisableUpdate = await confirm('是否要禁用 Cursor 自动更新功能？');
+    if (shouldDisableUpdate) {
+      console.log('正在禁用自动更新...');
+      if (await disableAutoUpdate()) {
+        console.log('✅ 自动更新已成功禁用');
+      } else {
+        console.error('❌ 禁用自动更新失败');
+      }
+    }
+
     console.log('\n✨ 现在可以启动 Cursor 编辑器了');
+    if (shouldDisableUpdate) {
+      console.log('⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本');
+    }
   } catch (error) {
     console.error('\n❌ 重置设备 ID 时出错：', error);
   }
