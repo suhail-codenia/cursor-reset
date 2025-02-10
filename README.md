@@ -20,7 +20,9 @@ A tool for resetting the trial period of the Cursor Editor.
 
 Due to restrictions in the new version of Cursor, resetting will no longer be supported for Cursor versions above 45.3.
 
-If you still want to use this script, please check your Cursor version and download Cursor version below 45.3.
+Supporting newer versions would require modifying system-level components, which could affect other programs on your computer.
+
+Therefore, we will not consider supporting higher versions. If you still want to use this script, please check your Cursor version and download Cursor version below 45.3.
 
 **Currently, only Cursor versions below 45.3 have been tested to support fingerprint reset.**
 
