@@ -16,6 +16,7 @@
  * 仓库地址: https://github.com/isboyjc/cursor-reset
  * 作者: @isboyjc
  * 创建时间: 29/Dec/2024
+ * 最后更新时间: 11/Feb/2025
  */
 
 const fs = require('fs').promises;
