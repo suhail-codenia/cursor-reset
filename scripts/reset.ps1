@@ -146,22 +146,18 @@ function Main {
     Write-Host
     Write-Host "📝 配置文件路径：$storageFile"
     Write-Host
-    Write-Host "🔄 自动更新设置"
-    $response = Read-Host "是否要禁用 Cursor 自动更新功能？ (y/N)"
-    if ($response -eq 'y' -or $response -eq 'Y') {
-        Write-Host "正在禁用自动更新..."
-        if (Disable-CursorUpdate) {
-            Write-Host "✅ 自动更新已成功禁用"
-        } else {
-            Write-Host "❌ 禁用自动更新失败"
-        }
+
+    # 自动禁用更新，无需询问
+    Write-Host "🔄 正在禁用自动更新..."
+    if (Disable-CursorUpdate) {
+        Write-Host "✅ 自动更新已成功禁用"
+    } else {
+        Write-Host "❌ 禁用自动更新失败"
     }
 
     Write-Host
     Write-Host "✨ 现在可以启动 Cursor 编辑器了"
-    if ($response -eq 'y' -or $response -eq 'Y') {
-        Write-Host "⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本"
-    }
+    Write-Host "⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本"
 }
 
 # 运行主程序

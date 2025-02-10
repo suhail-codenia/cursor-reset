@@ -162,23 +162,18 @@ EOF
     echo
     echo "📝 配置文件路径：$STORAGE_FILE"
     echo
-    echo "🔄 自动更新设置"
-    echo "是否要禁用 Cursor 自动更新功能？ (y/N): "
-    read -r response
-    if [[ "$response" =~ ^[Yy]$ ]]; then
-        echo "正在禁用自动更新..."
-        if disable_cursor_update; then
-            echo "✅ 自动更新已成功禁用"
-        else
-            echo "❌ 禁用自动更新失败"
-        fi
+
+    # 自动禁用更新，无需询问
+    echo "🔄 正在禁用自动更新..."
+    if disable_cursor_update; then
+        echo "✅ 自动更新已成功禁用"
+    else
+        echo "❌ 禁用自动更新失败"
     fi
 
     echo
     echo "✨ 现在可以启动 Cursor 编辑器了"
-    if [[ "$response" =~ ^[Yy]$ ]]; then
-        echo "⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本"
-    fi
+    echo "⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本"
 }
 
 main

@@ -548,21 +548,17 @@ async function resetCursorId() {
       });
     }
 
-    console.log('\n🔄 自动更新设置');
-    const shouldDisableUpdate = await confirm('是否要禁用 Cursor 自动更新功能？');
-    if (shouldDisableUpdate) {
-      console.log('正在禁用自动更新...');
-      if (await disableAutoUpdate()) {
-        console.log('✅ 自动更新已成功禁用');
-      } else {
-        console.error('❌ 禁用自动更新失败');
-      }
+    // 自动禁用更新，无需询问
+    console.log('\n🔄 正在禁用自动更新...');
+    if (await disableAutoUpdate()) {
+      console.log('✅ 自动更新已成功禁用');
+    } else {
+      console.error('❌ 禁用自动更新失败');
     }
 
     console.log('\n✨ 现在可以启动 Cursor 编辑器了');
-    if (shouldDisableUpdate) {
-      console.log('⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本');
-    }
+    console.log('⚠️ 提示：已禁用自动更新，如需更新请手动下载新版本');
+
   } catch (error) {
     console.error('\n❌ 重置设备 ID 时出错：', error);
   }
