@@ -552,9 +552,9 @@ async function resetCursorId() {
     // 自动禁用更新，无需询问
     console.log('\n🔄 正在禁用自动更新...');
     if (await disableAutoUpdate()) {
-      console.log('✅ 自动更新已成功禁用');
+      console.log('✅ 自动更新已成功禁用！');
     } else {
-      console.error('❌ 禁用自动更新失败');
+      console.error('❌ 禁用自动更新失败！');
     }
 
     console.log('\n✨ 现在可以启动 Cursor 编辑器了');
